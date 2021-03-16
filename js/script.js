@@ -69,20 +69,26 @@ activitiesField.addEventListener('change', (e) => {
 });
 
 /* 'Payment Info' section
-    *
+    * Display credit card payment as default
+    * Payment method is displayed based on user selection
 */
 const selectPayment = document.getElementById('payment');
 selectPayment[1].selected = true;
+
+/* ------------------ I WANT TO CLEAN THIS UP -----------*/
 //grab payment options
 let paymentDivs = [];
 paymentDivs.push(document.getElementById('credit-card'));
 paymentDivs.push(document.getElementById('paypal'));
 paymentDivs.push(document.getElementById('bitcoin'));
+/* ------------------ ----------------------- -----------*/
+
 //hide all payment options except for credit-card
 for(let i = 1; i < paymentDivs.length; i++){
     paymentDivs[i].hidden = true;
 }
 
+/*-------------THIS EVENT LISTENER IS REPETITIVE--------------- */
 selectPayment.addEventListener('change', (e) => {
    if(e.target.value === 'credit-card'){
        for( let i = 0; i < paymentDivs.length; i++){
@@ -110,3 +116,28 @@ selectPayment.addEventListener('change', (e) => {
         }
    }
 });
+
+
+
+/**
+ * Validating functions
+ */
+
+//Name field cannot be blank
+//regex accounts for hyphanated names (Latinx inclusion :D)
+function isValidName(name){
+    return /[a-z]+.[a-z]+.[a-z]+/i.test(name);
+}
+
+//Must be a valid email address
+function isValidEmail(email) {
+    return /^[^@]+@[^@.]+\.[a-z]+$/i.test(email);
+}
+
+/* Form validation
+    * 
+*/
+const form = document.querySelector('form');
+form.addEventListener('submit', (e) => {
+
+})
