@@ -68,3 +68,45 @@ activitiesField.addEventListener('change', (e) => {
     }
 });
 
+/* 'Payment Info' section
+    *
+*/
+const selectPayment = document.getElementById('payment');
+selectPayment[1].selected = true;
+//grab payment options
+let paymentDivs = [];
+paymentDivs.push(document.getElementById('credit-card'));
+paymentDivs.push(document.getElementById('paypal'));
+paymentDivs.push(document.getElementById('bitcoin'));
+//hide all payment options except for credit-card
+for(let i = 1; i < paymentDivs.length; i++){
+    paymentDivs[i].hidden = true;
+}
+
+selectPayment.addEventListener('change', (e) => {
+   if(e.target.value === 'credit-card'){
+       for( let i = 0; i < paymentDivs.length; i++){
+           if(paymentDivs[i].getAttribute('id') === 'credit-card'){
+               paymentDivs[i].hidden = false;
+           } else {
+               paymentDivs[i].hidden = true;
+           }
+       }
+   } else if(e.target.value === 'paypal'){
+        for( let i = 0; i < paymentDivs.length; i++){
+            if(paymentDivs[i].getAttribute('id') === 'paypal'){
+                paymentDivs[i].hidden = false;
+            } else {
+                paymentDivs[i].hidden = true;
+            }
+        }
+   } else {
+        for( let i = 0; i < paymentDivs.length; i++){
+            if(paymentDivs[i].getAttribute('id') === 'bitcoin'){
+                paymentDivs[i].hidden = false;
+            } else {
+                paymentDivs[i].hidden = true;
+            }
+        }
+   }
+});
