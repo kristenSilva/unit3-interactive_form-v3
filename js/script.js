@@ -51,5 +51,20 @@ selectDesign.addEventListener('change', (e) => {
 });
 
 /* 'Register for Activities' section
-    * 
+    * Total cost of activities is updated based on user selection
 */
+const activitiesField = document.getElementById('activities');
+const activitiesCost = document.querySelector('.activities-cost');
+let totalCost = 0;
+
+activitiesField.addEventListener('change', (e) => {
+    const price = parseInt(e.target.getAttribute('data-cost'));
+    if(e.target.checked){
+        totalCost += price;
+        activitiesCost.innerHTML = `Total: \$${totalCost}`;
+    } else {
+        totalCost -= price;
+        activitiesCost.innerHTML = `Total: \$${totalCost}`;
+    }
+});
+
