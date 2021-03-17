@@ -28,7 +28,6 @@ const selectDesign = document.getElementById('design');
 selectDesign.addEventListener('change', (e) => {
     selectColor.disabled = false;
     const design = e.target.value;
-    console.log(design);
     if(design === 'js puns'){
         selectColor[1].selected = true;
         for(let i = 0; i < selectColor.length; i++){
@@ -65,6 +64,21 @@ activitiesField.addEventListener('change', (e) => {
     } else {
         totalCost -= price;
         activitiesCost.innerHTML = `Total: \$${totalCost}`;
+    }
+});
+
+//const checkboxLabels = document.getElementById('activities-box').children;
+const checkboxes = document.querySelectorAll('[type="checkbox"]');
+
+checkboxes.addEventListener('focus', (e) => {
+    e.target.parentNode.className = 'focus';
+});
+
+checkboxes.addEventListener('blur', (e) => {
+    for(let i = 0; i < checkboxes.length; i++){
+        if(checkboxes[i].parentNode.className === 'focus'){
+            checkboxes[i].parentNode.className = '';
+        }
     }
 });
 
@@ -124,9 +138,8 @@ selectPayment.addEventListener('change', (e) => {
  */
 
 //Name field cannot be blank
-//regex accounts for hyphanated names (Latinx inclusion :D)
 function isValidName(name){
-    return /[a-z]+.[a-z]+.[a-z]+/i.test(name);
+    return /[a-z]+\s[a-z]+/i.test(name);
 }
 
 //Must be a valid email address
@@ -134,10 +147,52 @@ function isValidEmail(email) {
     return /^[^@]+@[^@.]+\.[a-z]+$/i.test(email);
 }
 
+//One activity must be selected for registration
+//checkboxes = array of input type checkbox
+function isValidRegistration(checkboxes){
+    var oneChecked = false;
+    for(let i = 0; i < checkboxes.length; i++){
+        if(checkboxes[i].checked){
+            oneChecked = true;
+            break;
+        } else {
+            oneChecked = false;
+        }
+    }
+    return oneChecked;
+}
+
+//Credit card payment has to contain valid credit card fields
+const creditCardNum = document.getElementById('cc-num');
+const zipCode = document.getElementById('zip');
+const cvv = document.getElementById('cvv');
+const regNumber = /^\d{13,16}$/;
+const regZip = /^\d{5}$/;
+const regCvv = /^\d{3}$/;
+
+function isValidPayment(payment){
+    var valid = false;
+    if(payment.value === 'credit-card'){
+        valid = regNumber.test(creditCardNum.value) && regZip.test(zipCode.value) && regCvv.test(cvv.value);
+    } else {
+        valid = true;
+    }
+    return valid;
+}
 /* Form validation
     * 
 */
 const form = document.querySelector('form');
-form.addEventListener('submit', (e) => {
+const emailInput = document.getElementById('email');
 
-})
+
+form.addEventListener('submit', (e) => {
+    let validForm = isValidName(nameInput.value) &&
+        isValidEmail(emailInput.value) &&
+        isValidRegistration(checkboxes) &&
+        isValidPayment(selectPayment);
+    if(!validForm){
+        e.preventDefault();
+        console.log('something is missing');
+    } 
+});
