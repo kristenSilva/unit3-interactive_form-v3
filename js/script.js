@@ -70,17 +70,17 @@ activitiesField.addEventListener('change', (e) => {
 //const checkboxLabels = document.getElementById('activities-box').children;
 const checkboxes = document.querySelectorAll('[type="checkbox"]');
 
-checkboxes.addEventListener('focus', (e) => {
-    e.target.parentNode.className = 'focus';
-});
-
-checkboxes.addEventListener('blur', (e) => {
-    for(let i = 0; i < checkboxes.length; i++){
+for(let i = 0; i < checkboxes.length; i++){
+    checkboxes[i].addEventListener('focus', (e) => {
+        e.target.parentNode.className = 'focus';
+    });
+    
+    checkboxes[i].addEventListener('blur', (e) => {
         if(checkboxes[i].parentNode.className === 'focus'){
-            checkboxes[i].parentNode.className = '';
+                checkboxes[i].parentNode.className = '';
         }
-    }
-});
+    });
+}
 
 /* 'Payment Info' section
     * Display credit card payment as default
