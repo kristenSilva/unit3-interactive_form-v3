@@ -91,6 +91,30 @@ for(let i = 0; i < checkboxes.length; i++){
     });
 }
 
+//control for conflicting events
+activitiesField.addEventListener('change', (e) => {
+    const clickedEvent = e.target;
+    const dateAndTime = e.target.getAttribute('data-day-and-time');
+    if (clickedEvent.checked){
+        for(let i = 0; i < checkboxes.length; i++){
+            if(checkboxes[i].getAttribute('data-day-and-time') === dateAndTime && 
+                checkboxes[i] !== clickedEvent){
+                checkboxes[i].disabled = true;
+                checkboxes[i].parentElement.classList.add('disabled');
+            }
+        }
+    } else {
+        for(let i = 0; i < checkboxes.length; i++){
+            if(checkboxes[i].getAttribute('data-day-and-time') === dateAndTime && 
+                checkboxes[i] !== clickedEvent){
+                checkboxes[i].disabled = false;
+                checkboxes[i].parentElement.classList.remove('disabled');
+            }
+        }
+    }
+});
+
+
 /**
  * 'Payment Info' section
     * Display credit card payment as default
@@ -130,34 +154,34 @@ selectPayment.addEventListener('change', (e) => {
  */
 
 //Name field cannot be blank
-function isValidName(name){
-    const nameIsValid = /^[a-zA-Z]+ ?[a-zA-Z]*? ?[a-zA-Z]*?$/.test(name.value);
+function isValidName(){
+    const nameIsValid = /^[a-zA-Z]+ ?[a-zA-Z]*? ?[a-zA-Z]*?$/.test(nameInput.value);
     if(nameIsValid){
-        validationPass(name);
+        validationPass(nameInput);
     } else {
-        validationFail(name);
+        validationFail(nameInput);
     }
     return nameIsValid;
 }
 
 //Must be a valid email address
-function isValidEmail(email) {
-    const emailIsValid = /^[^@]+@[^@.]+\.[a-z]+$/i.test(email.value);
+function isValidEmail() {
+    const emailIsValid = /^[^@]+@[^@.]+\.[a-z]+$/i.test(emailInput.value);
     if(emailIsValid){
-        validationPass(email);
+        validationPass(emailInput);
     } else {
-        validationFail(email);
+        validationFail(emailInput);
     }
     return emailIsValid;
 }
 
 //One activity must be selected for registration
-function isValidRegistration(activities){
+function isValidActivity(){
     const activityIsValid = totalCost > 0;
     if(activityIsValid){
-        validationPass(activities);
+        validationPass(activitiesCost);
     } else {
-        validationFail(activities);
+        validationFail(activitiesCost);
     }
     return activityIsValid;
 }
@@ -167,9 +191,9 @@ const regExpNumber = /^\d{13,16}$/;
 const regExpZip = /^\d{5}$/;
 const regExpCvv = /^\d{3}$/;
 
-function isValidPayment(payment){
+function isValidPayment(){
     var valid = false;
-    if(payment.value === 'credit-card'){
+    if(selectPayment.value === 'credit-card'){
         valid = regExpNumber.test(creditCardNum.value) && 
                 regExpZip.test(zipCode.value) && 
                 regExpCvv.test(cvv.value);
@@ -213,6 +237,13 @@ function validationFail(element){
     parent.classList.remove('valid');
     parent.lastElementChild.hidden = false;
   }
+/**
+ * Real-time Validation
+ */
+ nameInput.addEventListener('keyup', isValidName);
+ emailInput.addEventListener('keyup', isValidEmail);
+ activitiesField.addEventListener('keyup', isValidActivity);
+ selectPayment.addEventListener('keyup', isValidPayment);
 
 /**
  * Form Validation
@@ -221,22 +252,22 @@ form.addEventListener('submit', (e) => {
     //COMMENT OUT AFTER TESTING
     e.preventDefault();
 
-    if (!isValidName(nameInput)) {
+    if (!isValidName()) {
         console.log('Invalid name prevented submission');
         e.preventDefault();
     }
 
-    if (!isValidEmail(emailInput)) {
+    if (!isValidEmail()) {
         console.log('Invalid email prevented submission');
         e.preventDefault();
     }
 
-    if (!isValidRegistration(activitiesCost)) {
+    if (!isValidActivity()) {
         console.log('Invalid activities selection prevented submission');
         e.preventDefault();
     }
 
-    if (!isValidPayment(selectPayment)) {
+    if (!isValidPayment()) {
         console.log('Invalid credit card input prevented submission');
         e.preventDefault();
     }
