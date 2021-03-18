@@ -1,14 +1,27 @@
-/* Focus on 'Name' field*/
+const form = document.querySelector('form');
 const nameInput = document.getElementById('name');
+const emailInput = document.getElementById('email');
+const otherJob = document.getElementById('other-job-role');
+const selectJob = document.getElementById('title');
+const selectDesign = document.getElementById('design');
+const selectColor = document.getElementById('color');
+const activitiesField = document.getElementById('activities');
+const checkboxes = document.querySelectorAll('[type="checkbox"]');
+const activitiesCost = document.getElementById('activities-cost');
+const selectPayment = document.getElementById('payment');
+const creditCardNum = document.getElementById('cc-num');
+const zipCode = document.getElementById('zip');
+const cvv = document.getElementById('cvv');
+
+//Focus on 'Name Field' upon load
 nameInput.focus();
 
-/* 'Job Role' section
+/**
+ * 'Job Role' section
     * Hide 'other job' input on start
     * Show 'other job' input based on user selection
 */
-const otherJob = document.getElementById('other-job-role');
 otherJob.style.display = 'none';
-const selectJob = document.getElementById('title');
 
 selectJob.addEventListener('change', (e) => {
     if(e.target.value === 'other'){
@@ -18,12 +31,11 @@ selectJob.addEventListener('change', (e) => {
     }
 });
 
-/* 'T-Shirt info' section 
+/**
+ * 'T-Shirt info' section 
     * Disable color selection until design element is selected
 */
-const selectColor = document.getElementById('color');
 selectColor.disabled = true;
-const selectDesign = document.getElementById('design');
 
 selectDesign.addEventListener('change', (e) => {
     selectColor.disabled = false;
@@ -49,12 +61,10 @@ selectDesign.addEventListener('change', (e) => {
     }
 });
 
-/* 'Register for Activities' section
+/**
+ * 'Register for Activities' section
     * Total cost of activities is updated based on user selection
 */
-const activitiesField = document.getElementById('activities');
-const activitiesCost = document.getElementById('activities-cost');
-const checkboxes = document.querySelectorAll('[type="checkbox"]');
 let totalCost = 0;
 
 activitiesField.addEventListener('change', (e) => {
@@ -68,7 +78,7 @@ activitiesField.addEventListener('change', (e) => {
     }
 });
 
-//Make focus state for activities more obvious for users
+//Make focus state for activities more obvious for users as they tab through
 for(let i = 0; i < checkboxes.length; i++){
     checkboxes[i].addEventListener('focus', (e) => {
         e.target.parentNode.className = 'focus';
@@ -81,52 +91,37 @@ for(let i = 0; i < checkboxes.length; i++){
     });
 }
 
-/* 'Payment Info' section
+/**
+ * 'Payment Info' section
     * Display credit card payment as default
     * Payment method is displayed based on user selection
 */
-const selectPayment = document.getElementById('payment');
-selectPayment[1].selected = true;
-
-/* ------------------ I WANT TO CLEAN THIS UP -----------*/
-//grab payment options
 let paymentDivs = [];
 paymentDivs.push(document.getElementById('credit-card'));
 paymentDivs.push(document.getElementById('paypal'));
 paymentDivs.push(document.getElementById('bitcoin'));
-/* ------------------ ----------------------- -----------*/
 
-//hide all payment options except for credit-card
-for(let i = 1; i < paymentDivs.length; i++){
-    paymentDivs[i].hidden = true;
+selectPayment[1].selected = true;
+hideShowPayment(paymentDivs, 'credit-card');
+
+//Helper function to hide/show payment based on user selection
+function hideShowPayment(paymentTypes, idName){
+    for(let i = 0; i < paymentTypes.length; i++){
+        if(paymentTypes[i].getAttribute('id') === idName){
+            paymentTypes[i].hidden = false;
+        } else {
+            paymentTypes[i].hidden = true;
+        }
+    }
 }
 
-/*-------------THIS EVENT LISTENER IS REPETITIVE--------------- */
 selectPayment.addEventListener('change', (e) => {
    if(e.target.value === 'credit-card'){
-       for( let i = 0; i < paymentDivs.length; i++){
-           if(paymentDivs[i].getAttribute('id') === 'credit-card'){
-               paymentDivs[i].hidden = false;
-           } else {
-               paymentDivs[i].hidden = true;
-           }
-       }
+       hideShowPayment(paymentDivs, 'credit-card');
    } else if(e.target.value === 'paypal'){
-        for( let i = 0; i < paymentDivs.length; i++){
-            if(paymentDivs[i].getAttribute('id') === 'paypal'){
-                paymentDivs[i].hidden = false;
-            } else {
-                paymentDivs[i].hidden = true;
-            }
-        }
+        hideShowPayment(paymentDivs, 'paypal');
    } else {
-        for( let i = 0; i < paymentDivs.length; i++){
-            if(paymentDivs[i].getAttribute('id') === 'bitcoin'){
-                paymentDivs[i].hidden = false;
-            } else {
-                paymentDivs[i].hidden = true;
-            }
-        }
+       hideShowPayment(paymentDivs, 'bitcoin');
    }
 });
 
@@ -157,57 +152,44 @@ function isValidEmail(email) {
 }
 
 //One activity must be selected for registration
-//checkboxes = array of input type checkbox
 function isValidRegistration(activities){
-    const activityIsValid = totalCost >0;
-    // for(let i = 0; i < checkboxes.length; i++){
-    //     if(checkboxes[i].checked){
-    //         oneChecked = true;
-    //         break;
-    //     } else {
-    //         oneChecked = false;
-    //     }
-    // }
-
+    const activityIsValid = totalCost > 0;
     if(activityIsValid){
         validationPass(activities);
     } else {
         validationFail(activities);
     }
-    
     return activityIsValid;
 }
 
 //Credit card payment has to contain valid credit card fields
-const creditCardNum = document.getElementById('cc-num');
-const zipCode = document.getElementById('zip');
-const cvv = document.getElementById('cvv');
-const regNumber = /^\d{13,16}$/;
-const regZip = /^\d{5}$/;
-const regCvv = /^\d{3}$/;
+const regExpNumber = /^\d{13,16}$/;
+const regExpZip = /^\d{5}$/;
+const regExpCvv = /^\d{3}$/;
 
 function isValidPayment(payment){
     var valid = false;
     if(payment.value === 'credit-card'){
-        valid = regNumber.test(creditCardNum.value) && regZip.test(zipCode.value) && regCvv.test(cvv.value);
-        if(regNumber.test(creditCardNum.value)){
+        valid = regExpNumber.test(creditCardNum.value) && 
+                regExpZip.test(zipCode.value) && 
+                regExpCvv.test(cvv.value);
+        if(regExpNumber.test(creditCardNum.value)){
             validationPass(creditCardNum);
         } else {
             validationFail(creditCardNum);
         }
 
-        if(regZip.test(zipCode.value)){
+        if(regExpZip.test(zipCode.value)){
             validationPass(zipCode);
         } else {
             validationFail(zipCode);
         }
 
-        if(regCvv.test(cvv.value)){
+        if(regExpCvv.test(cvv.value)){
             validationPass(cvv);
         } else {
             validationFail(cvv);
         }
-
     } else {
         valid = true;
     }
@@ -232,23 +214,12 @@ function validationFail(element){
     parent.lastElementChild.hidden = false;
   }
 
-/* Form validation
-    * 
-*/
-const form = document.querySelector('form');
-const emailInput = document.getElementById('email');
-
-
+/**
+ * Form Validation
+ */
 form.addEventListener('submit', (e) => {
-    // let validForm = isValidName(nameInput) &&
-    //     isValidEmail(emailInput.value) &&
-    //     isValidRegistration(checkboxes) &&
-    //     isValidPayment(selectPayment);
-    // if(!validForm){
-    //     e.preventDefault();
-    //     console.log('something is missing');
-    // } 
-    //e.preventDefault();
+    //COMMENT OUT AFTER TESTING
+    e.preventDefault();
 
     if (!isValidName(nameInput)) {
         console.log('Invalid name prevented submission');
@@ -269,5 +240,4 @@ form.addEventListener('submit', (e) => {
         console.log('Invalid credit card input prevented submission');
         e.preventDefault();
     }
-    
 });
