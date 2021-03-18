@@ -53,7 +53,8 @@ selectDesign.addEventListener('change', (e) => {
     * Total cost of activities is updated based on user selection
 */
 const activitiesField = document.getElementById('activities');
-const activitiesCost = document.querySelector('.activities-cost');
+const activitiesCost = document.getElementById('activities-cost');
+const checkboxes = document.querySelectorAll('[type="checkbox"]');
 let totalCost = 0;
 
 activitiesField.addEventListener('change', (e) => {
@@ -67,9 +68,7 @@ activitiesField.addEventListener('change', (e) => {
     }
 });
 
-//const checkboxLabels = document.getElementById('activities-box').children;
-const checkboxes = document.querySelectorAll('[type="checkbox"]');
-
+//Make focus state for activities more obvious for users
 for(let i = 0; i < checkboxes.length; i++){
     checkboxes[i].addEventListener('focus', (e) => {
         e.target.parentNode.className = 'focus';
@@ -131,35 +130,52 @@ selectPayment.addEventListener('change', (e) => {
    }
 });
 
-
-
 /**
  * Validating functions
  */
 
 //Name field cannot be blank
 function isValidName(name){
-    return /[a-z]+\s[a-z]+/i.test(name);
+    const nameIsValid = /^[a-zA-Z]+ ?[a-zA-Z]*? ?[a-zA-Z]*?$/.test(name.value);
+    if(nameIsValid){
+        validationPass(name);
+    } else {
+        validationFail(name);
+    }
+    return nameIsValid;
 }
 
 //Must be a valid email address
 function isValidEmail(email) {
-    return /^[^@]+@[^@.]+\.[a-z]+$/i.test(email);
+    const emailIsValid = /^[^@]+@[^@.]+\.[a-z]+$/i.test(email.value);
+    if(emailIsValid){
+        validationPass(email);
+    } else {
+        validationFail(email);
+    }
+    return emailIsValid;
 }
 
 //One activity must be selected for registration
 //checkboxes = array of input type checkbox
-function isValidRegistration(checkboxes){
-    var oneChecked = false;
-    for(let i = 0; i < checkboxes.length; i++){
-        if(checkboxes[i].checked){
-            oneChecked = true;
-            break;
-        } else {
-            oneChecked = false;
-        }
+function isValidRegistration(activities){
+    const activityIsValid = totalCost >0;
+    // for(let i = 0; i < checkboxes.length; i++){
+    //     if(checkboxes[i].checked){
+    //         oneChecked = true;
+    //         break;
+    //     } else {
+    //         oneChecked = false;
+    //     }
+    // }
+
+    if(activityIsValid){
+        validationPass(activities);
+    } else {
+        validationFail(activities);
     }
-    return oneChecked;
+    
+    return activityIsValid;
 }
 
 //Credit card payment has to contain valid credit card fields
@@ -174,11 +190,48 @@ function isValidPayment(payment){
     var valid = false;
     if(payment.value === 'credit-card'){
         valid = regNumber.test(creditCardNum.value) && regZip.test(zipCode.value) && regCvv.test(cvv.value);
+        if(regNumber.test(creditCardNum.value)){
+            validationPass(creditCardNum);
+        } else {
+            validationFail(creditCardNum);
+        }
+
+        if(regZip.test(zipCode.value)){
+            validationPass(zipCode);
+        } else {
+            validationFail(zipCode);
+        }
+
+        if(regCvv.test(cvv.value)){
+            validationPass(cvv);
+        } else {
+            validationFail(cvv);
+        }
+
     } else {
         valid = true;
     }
     return valid;
 }
+
+//Changes parent element class to 'valid'
+// element - HTML element
+function validationPass(element){
+    let parent = element.parentElement;
+    parent.classList.add('valid');
+    parent.classList.remove('not-valid');
+    parent.lastElementChild.hidden = true;
+  }
+
+//Changes parent element class to 'not-valid' & shows message on screen
+// element - HTML element
+function validationFail(element){
+    let parent = element.parentElement;
+    parent.classList.add('not-valid');
+    parent.classList.remove('valid');
+    parent.lastElementChild.hidden = false;
+  }
+
 /* Form validation
     * 
 */
@@ -187,12 +240,34 @@ const emailInput = document.getElementById('email');
 
 
 form.addEventListener('submit', (e) => {
-    let validForm = isValidName(nameInput.value) &&
-        isValidEmail(emailInput.value) &&
-        isValidRegistration(checkboxes) &&
-        isValidPayment(selectPayment);
-    if(!validForm){
+    // let validForm = isValidName(nameInput) &&
+    //     isValidEmail(emailInput.value) &&
+    //     isValidRegistration(checkboxes) &&
+    //     isValidPayment(selectPayment);
+    // if(!validForm){
+    //     e.preventDefault();
+    //     console.log('something is missing');
+    // } 
+    //e.preventDefault();
+
+    if (!isValidName(nameInput)) {
+        console.log('Invalid name prevented submission');
         e.preventDefault();
-        console.log('something is missing');
-    } 
+    }
+
+    if (!isValidEmail(emailInput)) {
+        console.log('Invalid email prevented submission');
+        e.preventDefault();
+    }
+
+    if (!isValidRegistration(activitiesCost)) {
+        console.log('Invalid activities selection prevented submission');
+        e.preventDefault();
+    }
+
+    if (!isValidPayment(selectPayment)) {
+        console.log('Invalid credit card input prevented submission');
+        e.preventDefault();
+    }
+    
 });
