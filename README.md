@@ -1,7 +1,7 @@
 # unit3-project-techdegree
  Interactive form
 
- Form elements/sections with real-time validation
+ Form elements/sections with real-time validation and conditional error messages
  1. Name section - alerts user if left blank or if invalid characters used (name field only takes letters)
  2. Email section - alerts user if left blank or if invalid characters used (email is formatted incorrectly)
  3. Activities section - alerts user if no activity is selected

@@ -157,21 +157,22 @@ selectPayment.addEventListener('change', (e) => {
 let invalidName= document.createElement('SPAN');
 invalidName.innerHTML = 'Name field can only be comprised of letters';
 invalidName.className = 'hint';
-nameInput.parentElement.appendChild(invalidName);
+nameInput.parentNode.insertBefore(invalidName,nameInput.nextElementSibling);
 
 function isValidName(){
     const nameIsValid = /^[a-zA-Z]+ ?[a-zA-Z]*? ?[a-zA-Z]*?$/.test(nameInput.value);
     if(nameInput.value === ''){
-        if(nameInput.parentElement.lastChild === invalidName){
-            nameInput.parentElement.removeChild(invalidName);
-        }
-        validationFail(nameInput);
-    } else if(!nameIsValid){
-        validationFail(nameInput);
-    } else {
-        validationPass(nameInput);
+        validationBlankFail(nameInput);
+        return nameIsValid;
     }
-    return nameIsValid;
+    if(!nameIsValid){
+        validationInvalidFail(nameInput);
+        return nameIsValid;
+    }
+    if(nameIsValid) {
+        validationPass(nameInput);
+        return nameIsValid;
+    }
 }
 
 //Must be a valid email address
@@ -183,16 +184,17 @@ emailInput.parentElement.appendChild(blankEmail);
 function isValidEmail() {
     const emailIsValid = /^[^@]+@[^@.]+\.[a-z]+$/i.test(emailInput.value);
     if(emailInput.value === ''){
-        validationFail(emailInput);
-    } else if (!emailIsValid){
-        if(emailInput.parentElement.lastChild === blankEmail){
-            emailInput.parentElement.removeChild(blankEmail);
-        }
-        validationFail(emailInput);
-    } else {
+        validationBlankFail(emailInput);
+        return emailIsValid;
+    } 
+    if(!emailIsValid){
+        validationInvalidFail(emailInput);
+        return emailIsValid;
+    } 
+    if(emailIsValid){
         validationPass(emailInput);
+        return emailIsValid;
     }
-    return emailIsValid;
 }
 
 //One activity must be selected for registration
@@ -200,8 +202,9 @@ function isValidActivity(){
     const activityIsValid = totalCost > 0;
     if(activityIsValid){
         validationPass(activitiesCost);
-    } else {
-        validationFail(activitiesCost);
+    }
+    if(!activityIsValid){
+        validationBlankFail(activitiesCost);
     }
     return activityIsValid;
 }
@@ -215,23 +218,24 @@ blankCardNum.className = 'hint';
 creditCardNum.parentElement.appendChild(blankCardNum);
 
 function isValidCardNum(){
-    let valid = false;
+    let valid = regExpNumber.test(creditCardNum.value);
     if(selectPayment.value === 'credit-card'){
-        valid = regExpNumber.test(creditCardNum.value);
         if(creditCardNum.value === ''){
-            validationFail(creditCardNum);
-        } else if(!valid){
-            if(creditCardNum.parentElement.lastChild === blankCardNum){
-                creditCardNum.parentElement.removeChild(blankCardNum);
-            }
-            validationFail(creditCardNum);
-        } else {
+            validationBlankFail(creditCardNum);
+            return valid;
+        }
+        if(!valid){
+            validationInvalidFail(creditCardNum);
+            return valid;
+        }
+        if(valid){
             validationPass(creditCardNum);
+            return valid;
         }
     } else {
         valid = true;
-    }
-    return valid;
+        return valid;
+    } 
 }
 
 //Validator for zip code
@@ -242,23 +246,24 @@ blankZip.className = 'hint';
 zipCode.parentElement.appendChild(blankZip);
 
 function isValidZip(){
-    let valid = false;
+    let valid = regExpZip.test(zipCode.value);
     if(selectPayment.value === 'credit-card'){
-        valid = regExpZip.test(zipCode.value);
         if(zipCode.value === ''){
-            validationFail(zipCode);
-        } else if(!valid){
-            if(zipCode.parentElement.lastChild === blankZip){
-                zipCode.parentElement.removeChild(blankZip);
-            }
-            validationFail(zipCode);
-        } else {
+            validationBlankFail(zipCode);
+            return valid;
+        }
+        if(!valid){
+            validationInvalidFail(zipCode);
+            return valid;
+        }
+        if(valid){
             validationPass(zipCode);
+            return valid;
         }
     } else {
         valid = true;
+        return valid;
     }
-    return valid;
 }
 
 //Validator for CVV
@@ -269,23 +274,24 @@ blankCvv.className = 'hint';
 cvv.parentElement.appendChild(blankCvv);
 
 function isValidCvv(){
-    let valid = false;
+    let valid = regExpCvv.test(cvv.value);
     if(selectPayment.value === 'credit-card'){
-        valid = regExpCvv.test(cvv.value);
         if(cvv.value === ''){
-            validationFail(cvv);
-        } else if(!valid){
-            if(cvv.parentElement.lastChild === blankCvv){
-                cvv.parentElement.removeChild(blankCvv);
-            }
-            validationFail(cvv);
-        } else {
+            validationBlankFail(cvv);
+            return valid;
+        }
+        if(!valid){
+            validationInvalidFail(cvv);
+            return valid;
+        } 
+        if(valid){
             validationPass(cvv);
+            return valid;
         }
     } else {
         valid = true;
+        return valid;
     }
-    return valid;
 }
 
 //validates all credit card fields
@@ -297,22 +303,32 @@ function isValidPayment(){
     return valid;
 }
 
-//Changes parent element class to 'valid'
+//Changes parent element class to 'valid' no error messages displayed
 // element - HTML element
 function validationPass(element){
     let parent = element.parentElement;
     parent.classList.add('valid');
     parent.classList.remove('not-valid');
+    element.nextElementSibling.style.display = 'none';
     parent.lastElementChild.style.display = 'none';
   }
 
-//Changes parent element class to 'not-valid' & shows message on screen
+//Changes parent element class to 'not-valid' & shows 'blank' error message on screen
 // element - HTML element
-function validationFail(element){
+function validationBlankFail(element){
     let parent = element.parentElement;
     parent.classList.add('not-valid');
     parent.classList.remove('valid');
-    parent.lastElementChild.style.display = 'inherit';
+    element.nextElementSibling.style.display = 'none';
+    parent.lastElementChild.style.display = 'inherit';    
+  }
+
+  function validationInvalidFail(element){
+      let parent = element.parentElement;
+      parent.classList.add('not-valid');
+      parent.classList.remove('valid');
+      element.nextElementSibling.style.display = 'inherit';
+      parent.lastElementChild.style.display = 'none';
   }
 
  
@@ -321,7 +337,8 @@ function validationFail(element){
  */
  nameInput.addEventListener('keyup', isValidName);
  emailInput.addEventListener('keyup', isValidEmail);
- activitiesField.addEventListener('keyup', isValidActivity);
+ activitiesField.addEventListener('change', isValidActivity);
+ selectPayment.addEventListener('keyup', isValidPayment);
  creditCardNum.addEventListener('keyup', isValidCardNum);
  zipCode.addEventListener('keyup', isValidZip);
  cvv.addEventListener('keyup', isValidCvv);
@@ -329,9 +346,6 @@ function validationFail(element){
  * Form Validation
  */
 form.addEventListener('submit', (e) => {
-    //COMMENT OUT AFTER TESTING
-    e.preventDefault();
-
     if (!isValidName()) {
         e.preventDefault();
     }
