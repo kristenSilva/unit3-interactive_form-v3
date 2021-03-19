@@ -91,7 +91,7 @@ for(let i = 0; i < checkboxes.length; i++){
     });
 }
 
-//control for conflicting events
+//Disable conflicting events
 activitiesField.addEventListener('change', (e) => {
     const clickedEvent = e.target;
     const dateAndTime = e.target.getAttribute('data-day-and-time');
@@ -153,7 +153,7 @@ selectPayment.addEventListener('change', (e) => {
  * Validating functions
  */
 
-//Name field cannot be blank
+//Name field cannot be blank and should only contain letters
 let invalidName= document.createElement('SPAN');
 invalidName.innerHTML = 'Name field can only be comprised of letters';
 invalidName.className = 'hint';
@@ -175,7 +175,7 @@ function isValidName(){
     }
 }
 
-//Must be a valid email address
+//Email address field must have a valid format and cannot be blank
 let blankEmail = document.createElement('SPAN');
 blankEmail.innerHTML = 'Email field cannot be blank';
 blankEmail.className = 'hint';
@@ -210,7 +210,7 @@ function isValidActivity(){
 }
 
 //Credit card payment has to contain valid credit card fields
-//Validator for credit card number
+//Credit card number field cannot be blank and has to contain 13-16 digits
 const regExpNumber = /^\d{13,16}$/;
 let blankCardNum = document.createElement('SPAN');
 blankCardNum.innerHTML = 'Card Number field cannot be blank';
@@ -238,7 +238,7 @@ function isValidCardNum(){
     } 
 }
 
-//Validator for zip code
+//Zip code field cannot be blank and has to contain 5 digits
 const regExpZip = /^\d{5}$/;
 let blankZip = document.createElement('SPAN');
 blankZip.innerHTML = 'Zip code field cannot be blank';
@@ -266,7 +266,7 @@ function isValidZip(){
     }
 }
 
-//Validator for CVV
+//CVV field cannot be blank and has to contain 3 digits
 const regExpCvv = /^\d{3}$/;
 let blankCvv = document.createElement('SPAN');
 blankCvv.innerHTML = 'CVV field cannot be blank';
@@ -294,7 +294,7 @@ function isValidCvv(){
     }
 }
 
-//validates all credit card fields
+//validates all credit card fields at once
 function isValidPayment(){
     let cardValid = isValidCardNum();
     let zipValid = isValidZip();
@@ -323,13 +323,15 @@ function validationBlankFail(element){
     parent.lastElementChild.style.display = 'inherit';    
   }
 
-  function validationInvalidFail(element){
-      let parent = element.parentElement;
-      parent.classList.add('not-valid');
-      parent.classList.remove('valid');
-      element.nextElementSibling.style.display = 'inherit';
-      parent.lastElementChild.style.display = 'none';
-  }
+//Changes parent element class to 'not-valid' & shows error message on screen relaying any formatting issues
+// element - HTML element
+function validationInvalidFail(element){
+    let parent = element.parentElement;
+    parent.classList.add('not-valid');
+    parent.classList.remove('valid');
+    element.nextElementSibling.style.display = 'inherit';
+    parent.lastElementChild.style.display = 'none';
+}
 
  
 /**
@@ -342,6 +344,7 @@ function validationBlankFail(element){
  creditCardNum.addEventListener('keyup', isValidCardNum);
  zipCode.addEventListener('keyup', isValidZip);
  cvv.addEventListener('keyup', isValidCvv);
+ 
 /**
  * Form Validation
  */
