@@ -154,23 +154,43 @@ selectPayment.addEventListener('change', (e) => {
  */
 
 //Name field cannot be blank
+let invalidName= document.createElement('SPAN');
+invalidName.innerHTML = 'Name field can only be comprised of letters';
+invalidName.className = 'hint';
+nameInput.parentElement.appendChild(invalidName);
+
 function isValidName(){
     const nameIsValid = /^[a-zA-Z]+ ?[a-zA-Z]*? ?[a-zA-Z]*?$/.test(nameInput.value);
-    if(nameIsValid){
-        validationPass(nameInput);
-    } else {
+    if(nameInput.value === ''){
+        if(nameInput.parentElement.lastChild === invalidName){
+            nameInput.parentElement.removeChild(invalidName);
+        }
         validationFail(nameInput);
+    } else if(!nameIsValid){
+        validationFail(nameInput);
+    } else {
+        validationPass(nameInput);
     }
     return nameIsValid;
 }
 
 //Must be a valid email address
+let blankEmail = document.createElement('SPAN');
+blankEmail.innerHTML = 'Email field cannot be blank';
+blankEmail.className = 'hint';
+emailInput.parentElement.appendChild(blankEmail);
+
 function isValidEmail() {
     const emailIsValid = /^[^@]+@[^@.]+\.[a-z]+$/i.test(emailInput.value);
-    if(emailIsValid){
-        validationPass(emailInput);
-    } else {
+    if(emailInput.value === ''){
         validationFail(emailInput);
+    } else if (!emailIsValid){
+        if(emailInput.parentElement.lastChild === blankEmail){
+            emailInput.parentElement.removeChild(blankEmail);
+        }
+        validationFail(emailInput);
+    } else {
+        validationPass(emailInput);
     }
     return emailIsValid;
 }
@@ -187,36 +207,93 @@ function isValidActivity(){
 }
 
 //Credit card payment has to contain valid credit card fields
+//Validator for credit card number
 const regExpNumber = /^\d{13,16}$/;
-const regExpZip = /^\d{5}$/;
-const regExpCvv = /^\d{3}$/;
+let blankCardNum = document.createElement('SPAN');
+blankCardNum.innerHTML = 'Card Number field cannot be blank';
+blankCardNum.className = 'hint';
+creditCardNum.parentElement.appendChild(blankCardNum);
 
-function isValidPayment(){
-    var valid = false;
+function isValidCardNum(){
+    let valid = false;
     if(selectPayment.value === 'credit-card'){
-        valid = regExpNumber.test(creditCardNum.value) && 
-                regExpZip.test(zipCode.value) && 
-                regExpCvv.test(cvv.value);
-        if(regExpNumber.test(creditCardNum.value)){
-            validationPass(creditCardNum);
-        } else {
+        valid = regExpNumber.test(creditCardNum.value);
+        if(creditCardNum.value === ''){
             validationFail(creditCardNum);
-        }
-
-        if(regExpZip.test(zipCode.value)){
-            validationPass(zipCode);
+        } else if(!valid){
+            if(creditCardNum.parentElement.lastChild === blankCardNum){
+                creditCardNum.parentElement.removeChild(blankCardNum);
+            }
+            validationFail(creditCardNum);
         } else {
-            validationFail(zipCode);
-        }
-
-        if(regExpCvv.test(cvv.value)){
-            validationPass(cvv);
-        } else {
-            validationFail(cvv);
+            validationPass(creditCardNum);
         }
     } else {
         valid = true;
     }
+    return valid;
+}
+
+//Validator for zip code
+const regExpZip = /^\d{5}$/;
+let blankZip = document.createElement('SPAN');
+blankZip.innerHTML = 'Zip code field cannot be blank';
+blankZip.className = 'hint';
+zipCode.parentElement.appendChild(blankZip);
+
+function isValidZip(){
+    let valid = false;
+    if(selectPayment.value === 'credit-card'){
+        valid = regExpZip.test(zipCode.value);
+        if(zipCode.value === ''){
+            validationFail(zipCode);
+        } else if(!valid){
+            if(zipCode.parentElement.lastChild === blankZip){
+                zipCode.parentElement.removeChild(blankZip);
+            }
+            validationFail(zipCode);
+        } else {
+            validationPass(zipCode);
+        }
+    } else {
+        valid = true;
+    }
+    return valid;
+}
+
+//Validator for CVV
+const regExpCvv = /^\d{3}$/;
+let blankCvv = document.createElement('SPAN');
+blankCvv.innerHTML = 'CVV field cannot be blank';
+blankCvv.className = 'hint';
+cvv.parentElement.appendChild(blankCvv);
+
+function isValidCvv(){
+    let valid = false;
+    if(selectPayment.value === 'credit-card'){
+        valid = regExpCvv.test(cvv.value);
+        if(cvv.value === ''){
+            validationFail(cvv);
+        } else if(!valid){
+            if(cvv.parentElement.lastChild === blankCvv){
+                cvv.parentElement.removeChild(blankCvv);
+            }
+            validationFail(cvv);
+        } else {
+            validationPass(cvv);
+        }
+    } else {
+        valid = true;
+    }
+    return valid;
+}
+
+//validates all credit card fields
+function isValidPayment(){
+    let cardValid = isValidCardNum();
+    let zipValid = isValidZip();
+    let cvvValid = isValidCvv();
+    let valid = cardValid && zipValid && cvvValid;
     return valid;
 }
 
@@ -226,7 +303,7 @@ function validationPass(element){
     let parent = element.parentElement;
     parent.classList.add('valid');
     parent.classList.remove('not-valid');
-    parent.lastElementChild.hidden = true;
+    parent.lastElementChild.style.display = 'none';
   }
 
 //Changes parent element class to 'not-valid' & shows message on screen
@@ -235,16 +312,19 @@ function validationFail(element){
     let parent = element.parentElement;
     parent.classList.add('not-valid');
     parent.classList.remove('valid');
-    parent.lastElementChild.hidden = false;
+    parent.lastElementChild.style.display = 'inherit';
   }
+
+ 
 /**
  * Real-time Validation
  */
  nameInput.addEventListener('keyup', isValidName);
  emailInput.addEventListener('keyup', isValidEmail);
  activitiesField.addEventListener('keyup', isValidActivity);
- selectPayment.addEventListener('keyup', isValidPayment);
-
+ creditCardNum.addEventListener('keyup', isValidCardNum);
+ zipCode.addEventListener('keyup', isValidZip);
+ cvv.addEventListener('keyup', isValidCvv);
 /**
  * Form Validation
  */
@@ -253,22 +333,18 @@ form.addEventListener('submit', (e) => {
     e.preventDefault();
 
     if (!isValidName()) {
-        console.log('Invalid name prevented submission');
         e.preventDefault();
     }
 
     if (!isValidEmail()) {
-        console.log('Invalid email prevented submission');
         e.preventDefault();
     }
 
     if (!isValidActivity()) {
-        console.log('Invalid activities selection prevented submission');
         e.preventDefault();
     }
 
     if (!isValidPayment()) {
-        console.log('Invalid credit card input prevented submission');
         e.preventDefault();
     }
 });
