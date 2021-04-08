@@ -1,6 +1,8 @@
 # unit3-project-techdegree
  Interactive form
 
+This project uses JavaScript to enhance an interactive registration form by adding customized and conditional behavior and interactive; validating user input and providing helpful error messages when user enters invalid information into form fields. 
+ 
  Form elements/sections with real-time validation and conditional error messages
  1. Name section - alerts user if left blank or if invalid characters used (name field only takes letters)
  2. Email section - alerts user if left blank or if invalid characters used (email is formatted incorrectly)
